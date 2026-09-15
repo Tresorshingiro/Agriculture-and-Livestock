@@ -1,0 +1,40 @@
+{
+  "name": "agriculture-livestock",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "node scripts/check-data.mjs && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "check:data": "node scripts/check-data.mjs",
+    "start": "NODE_ENV=production node server/index.js",
+    "cert": "mkdir -p .certs && openssl req -x509 -newkey rsa:2048 -nodes -days 825 -keyout .certs/dev-key.pem -out .certs/dev-cert.pem -subj \"/CN=localhost\" -addext \"subjectAltName=DNS:localhost,DNS:127.0.0.1,IP:127.0.0.1\"",
+    "start:local": "NODE_ENV=production HTTP_ONLY=1 node server/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-router-dom": "^7.18.3"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.7",
+    "@vitejs/plugin-react": "^6.1.1",
+    "autoprefixer": "^10.5.4",
+    "jsdom": "^29.1.1",
+    "postcss": "^8.5.27",
+    "tailwindcss": "^3.4.19",
+    "vite": "^8.2.2",
+    "vitest": "^4.1.11"
+  }
+}

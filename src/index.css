@@ -1,0 +1,984 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================================
+   Tokens
+   ========================================================================= */
+:root {
+  /* Ground: a dark field at dusk, not deep space. Every surface is the same
+     green-black hue at rising lightness, so the chrome recedes and the light
+     ArcGIS applications in the pane read as the lit object on it. */
+  --deep: #0a1410;
+  --night: #0e1c15;
+  --page: #12241a;
+  --raised: #1b3324;
+  --glass: rgba(27, 51, 36, 0.62);
+  --border: rgba(58, 92, 66, 0.6);
+
+  /* Text carries the faintest green cast so it sits on the ground rather than
+     floating over it. */
+  --text: #ffffff;
+  --text-2: #e6efe6;
+  --text-3: #c6d7c6;
+  --caption: #95ac98;
+  --dim: #6b8370;
+
+  /* Leaf is the interactive colour: focus rings, active icons, the primary
+     button. Grain is the warm counterpart, reserved for type set over a
+     photograph, where a green would disappear into the field behind it. */
+  --leaf-300: #8fe3a3;
+  --leaf-400: #5fd07b;
+  --leaf-500: #3fb863;
+  --leaf-600: #2e9e4f;
+  --leaf-700: #237a3d;
+  --olive-600: #5f8c22;
+  --grain-300: #f2ce6b;
+  --grain-500: #d8a83a;
+}
+
+/* ============================================================================
+   Base
+   ========================================================================= */
+html,
+body,
+#root {
+  height: 100%;
+  min-height: 100dvh;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--text-2);
+  background: var(--deep);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--text);
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--leaf-400);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ============================================================================
+   Shared pieces: eyebrow, buttons, loader, field wash
+   ========================================================================= */
+.eyebrow {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--leaf-400);
+  font-weight: 600;
+}
+
+/* Over a photograph, where leaf green sinks into the field behind it. */
+.eyebrow.light {
+  color: var(--grain-300);
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 20px;
+  min-height: 48px;
+  border: 0;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--leaf-600) 0%, var(--olive-600) 100%);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 0 20px rgba(46, 158, 79, 0.3);
+  transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, var(--leaf-700) 0%, var(--olive-600) 100%);
+  box-shadow: 0 0 28px rgba(46, 158, 79, 0.45);
+}
+
+.btn-primary:disabled {
+  cursor: progress;
+  opacity: 0.85;
+}
+
+/* Loader --------------------------------------------------------------- */
+.boot-spinner {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  border: 3px solid rgba(95, 208, 123, 0.25);
+  border-top-color: var(--leaf-400);
+  animation: boot-spin 0.9s linear infinite;
+}
+
+.boot-spinner::after {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 999px;
+  border: 1px solid rgba(95, 208, 123, 0.25);
+  animation: boot-ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.boot-spinner--sm {
+  width: 18px;
+  height: 18px;
+  border-width: 2px;
+}
+
+.boot-spinner--sm::after {
+  display: none;
+}
+
+@keyframes boot-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes boot-ping {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.8;
+  }
+  80%,
+  100% {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+}
+
+.boot-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  gap: 16px;
+  background: rgba(10, 20, 16, 0.88);
+  backdrop-filter: blur(8px);
+  color: var(--caption);
+}
+
+.boot-screen p {
+  margin: 0;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+
+/* Field wash ----------------------------------------------------------- */
+/*
+ * What used to be a drifting starfield. Stars belonged to the environmental
+ * portal's night sky; over a photograph of a crop field they read as dust on
+ * the lens. This is the light instead: a warm sun high on one side and the
+ * green of the field rising from the opposite corner, which grounds the
+ * caption type without another gradient scrim on top of the image.
+ *
+ * Static by design, so there is nothing here for reduced motion to turn off.
+ */
+.fieldwash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(120% 80% at 78% 4%, rgba(242, 206, 107, 0.18), transparent 58%),
+    radial-gradient(100% 75% at 6% 100%, rgba(46, 158, 79, 0.2), transparent 62%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boot-spinner,
+  .boot-spinner::after {
+    animation: none;
+  }
+}
+
+/* ============================================================================
+   Shell
+   ========================================================================= */
+.shell {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(160deg, var(--page) 0%, var(--raised) 48%, var(--page) 100%);
+}
+
+/* The workspace is a single locked viewport: nothing on it ever scrolls the
+   page. The main row is given the exact leftover height so the sidebar and the
+   map always reach the bottom of the window, whatever the dropdowns do. */
+.shell--workspace {
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.shell--workspace .main {
+  display: flex; /* required — otherwise workspace will not stretch */
+  flex: 1;
+  min-height: 0;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.shell--page .main {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/*
+ * The way back in: a handle on the pane's left edge.
+ *
+ * The collapse control sits inside the sidebar now, and a collapsed sidebar is
+ * zero-width on a desktop and off-canvas on a phone — so it takes its own
+ * button out of reach with it. This one only exists while the sidebar is shut.
+ *
+ * It is an edge handle rather than a floating button in the corner because the
+ * corner is taken: every one of these applications sets its own title across
+ * the top-left of its frame, and a button there sat on top of the first word.
+ * Flush to the edge at mid-height it covers nothing, and it reads as the panel
+ * it pulls back out.
+ */
+.nav-reopen {
+  position: absolute;
+  z-index: 25;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid #e4e1da;
+  border-left: 0;
+  border-radius: 0 8px 8px 0;
+  background: #ffffff;
+  color: var(--leaf-700);
+  box-shadow: 2px 0 12px rgba(10, 20, 16, 0.18);
+  cursor: pointer;
+  transition: background 160ms ease, width 160ms ease;
+}
+
+.nav-reopen:hover {
+  width: 28px;
+  background: #f1f8f3;
+}
+
+.nav-reopen svg {
+  flex-shrink: 0;
+}
+
+/* ============================================================================
+   Workspace
+   ========================================================================= */
+.workspace {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
+.workspace-sidebar {
+  width: 300px;
+  flex-shrink: 0;
+  height: 100%;
+  align-self: stretch;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border-right: 1px solid #e4e1da;
+  transition: width 220ms ease, opacity 180ms ease, padding 220ms ease;
+}
+
+/* Desktop collapse: the column goes to zero width and the pane takes the room.
+   The app's own height is untouched, so nothing ever gaps at the bottom. */
+.workspace.is-nav-closed .workspace-sidebar {
+  width: 0;
+  padding-left: 0;
+  padding-right: 0;
+  border-right-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.workspace-pane,
+.viewer.viewer--pane {
+  flex: 1;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--deep);
+}
+
+.workspace-pane > * {
+  height: 100%;
+}
+
+.workspace-scrim {
+  display: none;
+}
+
+/* Sidebar content ------------------------------------------------------ */
+
+/*
+ * One sidebar layout for every portal: a brand badge beside the portal's name,
+ * headings with their own icon tile, rows that light up as a filled pill, and
+ * the signed-in user above a Logout row.
+ *
+ * `--brand-accent` (text-grade, 4.5:1 on white) and `--brand-tint` (washes
+ * only) are set on the sidebar by the component from the same values the login
+ * uses, so the colour follows each portal without a per-portal rule. There are
+ * no rails: separation comes from spacing and the heading tiles.
+ */
+.workspace-sidebar {
+  --chrome-text: #12100e;
+  --chrome-text-2: #3a3733;
+  --chrome-dim: #6e6a63;
+  --chrome-hairline: #e4e1da;
+  --brand-accent: var(--leaf-700);
+  --brand-tint: var(--brand-accent);
+  --brand-soft: color-mix(in srgb, var(--brand-tint) 30%, #ffffff);
+  --brand-hover: color-mix(in srgb, var(--brand-tint) 10%, #ffffff);
+  background: #ffffff;
+}
+
+.sidebar__top {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 12px 14px 14px;
+  border-bottom: 1px solid var(--chrome-hairline);
+}
+
+.sidebar__brand {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.sidebar__badge {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  color: #ffffff;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--brand-tint) 70%, var(--brand-accent)),
+    var(--brand-accent)
+  );
+  box-shadow: 0 4px 10px color-mix(in srgb, var(--brand-accent) 24%, transparent);
+}
+.sidebar__badge svg { stroke-width: 2.1; }
+
+.sidebar__name {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--brand-accent);
+  text-wrap: balance;
+}
+
+.sidebar__collapse {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  border: 1px solid var(--chrome-hairline);
+  background: #ffffff;
+  color: var(--brand-accent);
+  box-shadow: 0 1px 2px rgba(18, 16, 14, 0.05);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.sidebar__collapse:hover {
+  border-color: var(--brand-accent);
+  background: var(--brand-hover);
+}
+
+/* Only the list scrolls; the brand and the account stay put. */
+.sidebar__scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 18px 12px 20px;
+}
+
+.navsection {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* A heading: its own white tile, then the name in bold. */
+.navhead {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 0 4px 4px;
+}
+.navhead__tile {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  border: 1px solid var(--chrome-hairline);
+  background: #ffffff;
+  color: var(--brand-accent);
+  box-shadow: 0 1px 3px rgba(18, 16, 14, 0.06);
+}
+.navhead__title {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--chrome-text);
+  text-wrap: balance;
+}
+
+/* A group inside a module, where the module already holds the heading. */
+.navsub {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 2px 8px 6px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--chrome-text-2);
+}
+.navsub svg { flex-shrink: 0; margin-top: 1px; color: var(--brand-accent); }
+
+.modlist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.modlist--nested { padding-left: 10px; }
+
+/* Rows wrap rather than truncate: the full application names are long. */
+.modlist__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 9px 12px;
+  border-radius: 12px;
+  font-size: 15px;
+  line-height: 1.35;
+  color: var(--chrome-text-2);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.modlist__item span {
+  text-wrap: balance;
+  overflow-wrap: break-word;
+}
+.modlist__item svg { flex-shrink: 0; margin-top: 1px; color: var(--brand-accent); }
+.modlist__item:hover { background: var(--brand-hover); color: var(--chrome-text); }
+.modlist__item.is-active {
+  background: var(--brand-soft);
+  color: var(--chrome-text);
+  font-weight: 700;
+}
+
+/*
+ * A dashboard's data collection form sits one step further in and reads
+ * quieter than the dashboard it feeds; it still lights up like any row.
+ */
+.modlist--form {
+  padding: 2px 0 0 30px;
+  gap: 0;
+}
+.modlist__item--form {
+  padding: 6px 10px;
+  font-size: 13px;
+  color: var(--chrome-dim);
+}
+.modlist__item--form svg { margin-top: 2px; }
+
+/* ---------- account ---------- */
+
+.sidebar__foot {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  padding: 12px 12px 14px;
+  border-top: 1px solid var(--chrome-hairline);
+}
+
+.account {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+  padding: 4px;
+}
+.account__avatar {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--brand-tint) 70%, var(--brand-accent)),
+    var(--brand-accent)
+  );
+}
+.account__name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--chrome-text);
+}
+
+.logout {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 8px 6px;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--chrome-text);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.logout svg { flex-shrink: 0; color: var(--chrome-text-2); }
+.logout:hover { background: var(--brand-hover); color: var(--brand-accent); }
+.logout:hover svg { color: var(--brand-accent); }
+
+/* ============================================================================
+   Welcome pane
+   ========================================================================= */
+.welcome {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  place-items: end stretch;
+  overflow: hidden;
+  background-color: var(--page);
+  background-size: cover;
+  background-position: center;
+}
+
+.welcome::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(10, 20, 16, 0.4),
+    rgba(10, 20, 16, 0.3) 40%,
+    rgba(18, 36, 26, 0.88)
+  );
+}
+
+.welcome-copy {
+  position: relative;
+  z-index: 1;
+  max-width: 42rem;
+  padding: 48px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.welcome-copy h1 {
+  font-size: clamp(1.6rem, 3.2vw, 2.4rem);
+  line-height: 1.15;
+}
+
+.welcome-tagline {
+  margin: 0;
+  color: var(--text-3);
+}
+
+/* Grain, not leaf. This line sits on the hero photograph, which is a field —
+   the interactive green reads as part of the crop behind it and stops looking
+   like the instruction it is. */
+.welcome-hint {
+  margin: 0;
+  font-weight: 600;
+  color: var(--grain-300);
+}
+
+/* ============================================================================
+   Viewer
+   ========================================================================= */
+/* flex-basis 0 so the frame takes the leftover space rather than its short
+   intrinsic height, which would leave a band of dead pane under the map. */
+.app-frame {
+  flex: 1 1 0;
+  min-height: 0;
+  width: 100%;
+  border: 0;
+  background: var(--deep);
+}
+
+/* ============================================================================
+   Login
+   ========================================================================= */
+
+/*
+ * Photograph on the left, a tinted panel with one credential card on the right.
+ *
+ * Every colour below is derived from two variables LoginPage sets from the
+ * portal's own catalog entry: --login-tint (the module accent) washes the panel
+ * and the inputs, --login-accent (the contrast-guarded accentText) carries the
+ * title, the badge, the focus ring and the button. So each split portal gets
+ * the same page in its own colour without a per-portal rule.
+ */
+.login {
+  --chrome-text: #12100e;
+  --chrome-text-2: #3a3733;
+  --chrome-dim: #6e6a63;
+  --chrome-danger: #b3261e;
+  --login-accent: var(--leaf-700);
+  --login-tint: var(--login-accent);
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  background: color-mix(in srgb, var(--login-tint) 20%, #ffffff);
+}
+
+.login-visual {
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+}
+
+.login-panel {
+  display: grid;
+  place-items: center;
+  padding: 32px 24px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 460px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 30px 26px;
+  border-radius: 16px;
+  border: 1px solid color-mix(in srgb, var(--login-tint) 35%, #ffffff);
+  background: #ffffff;
+  box-shadow:
+    0 1px 2px rgba(18, 16, 14, 0.04),
+    0 18px 40px color-mix(in srgb, var(--login-accent) 16%, transparent);
+}
+
+.login-card__badge {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 10px;
+  color: #ffffff;
+  background: var(--login-accent);
+}
+.login-card__badge svg { stroke-width: 2.2; }
+
+.login-card__title {
+  margin: 2px 0 6px;
+  font-size: clamp(1.45rem, 2.6vw, 1.95rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--login-accent);
+}
+
+.field { width: 100%; display: flex; flex-direction: column; gap: 6px; }
+
+.field label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--chrome-text-2);
+}
+
+.field input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 14px;
+  border-radius: 8px;
+  border: 1.5px solid color-mix(in srgb, var(--login-tint) 50%, #ffffff);
+  background: color-mix(in srgb, var(--login-tint) 5%, #ffffff);
+  color: var(--chrome-text);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.field input::placeholder { color: var(--chrome-dim); }
+.field input:focus {
+  outline: none;
+  border-color: var(--login-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--login-tint) 22%, transparent);
+}
+.field input:disabled { opacity: 0.6; }
+
+.login-card__error {
+  width: 100%;
+  margin: 0;
+  font-size: 13px;
+  color: var(--chrome-danger);
+}
+
+.login-card__submit {
+  width: 100%;
+  margin-top: 8px;
+  min-height: 44px;
+  border-radius: 8px;
+  background: linear-gradient(
+    90deg,
+    var(--login-accent),
+    color-mix(in srgb, var(--login-accent) 80%, #000000)
+  );
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--login-accent) 22%, transparent);
+  transition: filter 0.15s ease;
+}
+.login-card__submit:hover:not(:disabled) {
+  background: linear-gradient(
+    90deg,
+    var(--login-accent),
+    color-mix(in srgb, var(--login-accent) 80%, #000000)
+  );
+  filter: brightness(0.94);
+}
+
+/* ============================================================================
+   Legal
+   ========================================================================= */
+.legal {
+  max-width: 52rem;
+  margin: 0 auto;
+  padding: 40px 24px 64px;
+}
+
+.legal-crumbs {
+  font-size: 13px;
+  color: var(--caption);
+  margin-bottom: 16px;
+}
+
+.legal-crumbs a:hover {
+  color: var(--leaf-400);
+}
+
+.legal h1 {
+  text-align: left;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  margin-bottom: 16px;
+}
+
+.legal p {
+  color: var(--text-3);
+  margin: 0 0 14px;
+}
+
+/* ============================================================================
+   Footer (legal pages only)
+   ========================================================================= */
+.site-footer {
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--deep);
+  border-top: 1px solid var(--border);
+}
+
+.footer-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 40px 24px 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 32px;
+}
+
+.footer-col h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.footer-col h2 svg {
+  color: var(--leaf-400);
+}
+
+.footer-brand-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.footer-brand-sub {
+  font-size: 12px;
+  color: var(--leaf-400);
+  margin-bottom: 8px;
+}
+
+.footer-col p,
+.footer-col li {
+  font-size: 13px;
+  color: var(--caption);
+}
+
+.footer-col ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.footer-col a:hover {
+  color: var(--leaf-400);
+}
+
+.footer-bottom {
+  position: relative;
+  z-index: 1;
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 16px 24px 32px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--dim);
+}
+
+.footer-legal-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.footer-legal-links a:hover {
+  color: var(--leaf-400);
+}
+
+/* ============================================================================
+   Responsive
+   ========================================================================= */
+@media (max-width: 960px) {
+  /* The sidebar becomes an overlay drawer. Width-0 is deliberately NOT used
+     here: a drawer must keep its width so it can slide out of the viewport. */
+  .workspace-sidebar {
+    position: absolute;
+    z-index: 30;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 300px;
+    height: auto;
+    transform: none;
+    box-shadow: 12px 0 32px rgba(10, 20, 16, 0.25);
+    transition: transform 220ms ease;
+  }
+
+  .workspace.is-nav-closed .workspace-sidebar {
+    width: 300px;
+    border-right-width: 1px;
+    opacity: 1;
+    transform: translateX(-105%);
+  }
+
+  .workspace.is-nav-open .workspace-scrim {
+    display: block;
+    position: absolute;
+    z-index: 20;
+    inset: 0;
+    background: rgba(10, 20, 16, 0.55);
+  }
+
+  .shell--workspace .main {
+    position: relative;
+  }
+
+  .welcome-copy {
+    padding: 32px 24px;
+  }
+}
+
+@media (max-width: 960px) {
+  .login {
+    grid-template-columns: 1fr;
+  }
+
+  .login-visual {
+    min-height: 180px;
+  }
+}
