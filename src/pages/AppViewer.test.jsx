@@ -44,16 +44,16 @@ describe('AppViewer', () => {
     expect(screen.queryByRole('link')).toBeNull()
   })
 
-  it('sends an unknown module or solution home rather than rendering a dead frame', () => {
-    renderAt('/module/advisory/app/anything')
-    expect(screen.queryByRole('iframe')).toBeNull()
-    expect(screen.getByText(/Open a module on the left/)).toBeInTheDocument()
+  it('sends an unknown module or solution home, which opens the first dashboard', () => {
+    // Home has no welcome page any more; it lands on the first map in the sidebar.
+    const { unmount } = renderAt('/module/advisory/app/anything')
+    expect(screen.getByTitle('Soil Information Mapping')).toHaveClass('app-frame')
+    expect(screen.queryByText(/Open a module on the left/)).toBeNull()
+    unmount()
 
     // A withdrawn solution is no different: its old link goes home.
     renderAt('/module/value-chain/app/export-crops-supply-chain')
     expect(screen.queryByTitle('Export Crops Supply Chain Mapping')).toBeNull()
-
-    renderAt('/module/livestock/app/not-a-solution')
-    expect(screen.getAllByText(/Open a module on the left/).length).toBeGreaterThan(0)
+    expect(screen.getByTitle('Soil Information Mapping')).toBeInTheDocument()
   })
 })
