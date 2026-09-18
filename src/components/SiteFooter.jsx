@@ -26,7 +26,7 @@ export default function SiteFooter() {
 
         <div className="footer-col">
           <h2>
-            <IconMark name="sparkles" size={16} />
+            <IconMark name="sparkles" size={14} />
             Quick links
           </h2>
           <ul>

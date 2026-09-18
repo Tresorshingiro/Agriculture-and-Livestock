@@ -52,7 +52,7 @@ export default function LoginPage() {
       <div className="login-panel">
         <form className="login-card" onSubmit={onSubmit}>
           <span className="login-card__badge" aria-hidden="true">
-            <IconMark name={brand.icon} size={32} />
+            <IconMark name={brand.icon} size={24} />
           </span>
           <h1 className="login-card__title">{portal.name}</h1>
 

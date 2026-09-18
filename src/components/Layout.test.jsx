@@ -60,14 +60,15 @@ describe('Layout', () => {
     expect(container.querySelector('.workspace-sidebar').textContent).not.toContain('GeoHub')
   })
 
-  it('puts the signed-in user and the way out at the foot of the sidebar', async () => {
+  it('puts the way out at the foot of the sidebar, and no user name', async () => {
     const { container } = renderAt('/')
     const foot = container.querySelector('.workspace-sidebar .sidebar__foot')
     expect(foot.querySelector('.logout').textContent).toBe('Logout')
-    // The session is answered by the server, so the name lands after the first
-    // paint rather than with it.
-    expect(await screen.findByText('Agri User')).toHaveClass('account__name')
-    expect(foot.querySelector('.account__avatar').textContent).toBe('A')
+    // The name is deliberately not shown, matching the sibling portals. Wait
+    // for the session to land so this is not passing only on the first paint.
+    await screen.findByRole('button', { name: 'Logout' })
+    expect(screen.queryByText('Agri User')).toBeNull()
+    expect(foot.querySelector('.account')).toBeNull()
   })
 
   it('marks the brand with an icon badge, never an agency logo image', () => {

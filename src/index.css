@@ -35,6 +35,60 @@
   --olive-600: #5f8c22;
   --grain-300: #f2ce6b;
   --grain-500: #d8a83a;
+
+  /*
+   * Design system: type, spacing, radius, elevation and shell sizes.
+   *
+   * Sizes only — no colour lives here. Every rule below speaks in these, so
+   * the same proportions hold across the login, the sidebar and the legal
+   * pages, and a change of density is made once.
+   */
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --text-caption: 11.5px;
+  --text-nav: 12px;
+  --text-brand: 12.5px;
+  --text-label: 13px;
+  --text-small: 14px;
+  --text-button: 15px;
+  --text-base: 16px;
+  --text-display: clamp(1.35rem, 1.1rem + 1.1vw, 2.2rem);
+
+  --tracking-heading: -0.03em;
+  --tracking-brand: -0.02em;
+  --tracking-caption: 0.14em;
+
+  --space-2xs: 2px;
+  --space-xs: 4px;
+  --space-xs-2: 6px;
+  --space-sm: 8px;
+  --space-sm-2: 10px;
+  --space-md: 12px;
+  --space-md-2: 14px;
+  --space-lg: 16px;
+  --space-lg-2: 18px;
+  --space-xl: 24px;
+  --space-xl-2: 28px;
+  --space-2xl: 40px;
+  --space-2xl-2: 48px;
+  --space-3xl: 64px;
+
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-pill: 980px;
+  --radius-circle: 999px;
+
+  --shadow-xs: 0 1px 2px rgba(18, 16, 14, 0.05);
+  --shadow-card: 0 1px 2px rgba(18, 16, 14, 0.04), 0 4px 14px rgba(18, 16, 14, 0.05);
+  --shadow-float: 0 12px 32px rgba(12, 11, 10, 0.18);
+
+  --icon: 16px;
+  --icon-stroke: 1.6;
+  --icon-stroke-control: 1.8;
+  --icon-gap: 8px;
+
+  --sidebar-w: 252px;
 }
 
 /* ============================================================================
@@ -49,8 +103,9 @@ body,
 
 body {
   margin: 0;
-  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  font-size: 16px;
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  font-weight: 400;
   line-height: 1.55;
   color: var(--text-2);
   background: var(--deep);
@@ -63,10 +118,14 @@ h2,
 h3,
 h4 {
   font-weight: 700;
-  letter-spacing: -0.03em;
+  line-height: 1.2;
+  letter-spacing: var(--tracking-heading);
   color: var(--text);
   margin: 0;
 }
+
+/* One stroke weight for the whole icon set; controls draw slightly heavier. */
+svg[stroke='currentColor'] { stroke-width: var(--icon-stroke); }
 
 a {
   color: inherit;
@@ -81,16 +140,16 @@ button {
 :focus-visible {
   outline: 2px solid var(--leaf-400);
   outline-offset: 2px;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
 }
 
 /* ============================================================================
    Shared pieces: eyebrow, buttons, loader, field wash
    ========================================================================= */
 .eyebrow {
-  font-size: 12px;
+  font-size: var(--text-caption);
   text-transform: uppercase;
-  letter-spacing: 0.16em;
+  letter-spacing: var(--tracking-caption);
   color: var(--leaf-400);
   font-weight: 600;
 }
@@ -104,14 +163,15 @@ button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  padding: 12px 20px;
-  min-height: 48px;
+  gap: var(--icon-gap);
+  padding: var(--space-md) var(--space-lg-2);
   border: 0;
-  border-radius: 10px;
+  border-radius: var(--radius-pill);
   background: linear-gradient(135deg, var(--leaf-600) 0%, var(--olive-600) 100%);
   color: #fff;
+  font-size: var(--text-button);
   font-weight: 600;
+  line-height: 1.5;
   cursor: pointer;
   box-shadow: 0 0 20px rgba(46, 158, 79, 0.3);
   transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
@@ -131,8 +191,8 @@ button {
 /* Loader --------------------------------------------------------------- */
 .boot-spinner {
   position: relative;
-  width: 48px;
-  height: 48px;
+  width: 36px;
+  height: 36px;
   border-radius: 999px;
   border: 3px solid rgba(95, 208, 123, 0.25);
   border-top-color: var(--leaf-400);
@@ -182,7 +242,7 @@ button {
   z-index: 80;
   display: grid;
   place-items: center;
-  gap: 16px;
+  gap: var(--space-lg);
   background: rgba(10, 20, 16, 0.88);
   backdrop-filter: blur(8px);
   color: var(--caption);
@@ -190,7 +250,7 @@ button {
 
 .boot-screen p {
   margin: 0;
-  font-size: 13px;
+  font-size: var(--text-label);
   letter-spacing: 0.04em;
 }
 
@@ -274,14 +334,14 @@ button {
   top: 50%;
   left: 0;
   transform: translateY(-50%);
-  width: 22px;
-  height: 56px;
+  width: 24px;
+  height: 48px;
   display: grid;
   place-items: center;
   padding: 0;
   border: 1px solid #e4e1da;
   border-left: 0;
-  border-radius: 0 8px 8px 0;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   background: #ffffff;
   color: var(--leaf-700);
   box-shadow: 2px 0 12px rgba(10, 20, 16, 0.18);
@@ -296,6 +356,7 @@ button {
 
 .nav-reopen svg {
   flex-shrink: 0;
+  stroke-width: var(--icon-stroke-control);
 }
 
 /* ============================================================================
@@ -313,7 +374,7 @@ button {
 }
 
 .workspace-sidebar {
-  width: 300px;
+  width: var(--sidebar-w);
   flex-shrink: 0;
   height: 100%;
   align-self: stretch;
@@ -357,16 +418,19 @@ button {
 }
 
 /* Sidebar content ------------------------------------------------------ */
-
 /*
  * One sidebar layout for every portal: a brand badge beside the portal's name,
- * headings with their own icon tile, rows that light up as a filled pill, and
- * the signed-in user above a Logout row.
+ * module and group headings as compact parent rows, their applications as
+ * indented child rows that light up as a filled pill, and a Logout row.
  *
  * `--brand-accent` (text-grade, 4.5:1 on white) and `--brand-tint` (washes
  * only) are set on the sidebar by the component from the same values the login
- * uses, so the colour follows each portal without a per-portal rule. There are
- * no rails: separation comes from spacing and the heading tiles.
+ * uses, so the colour follows each portal without a per-portal rule.
+ *
+ * Geometry: parents sit at 8px, their icon is 16px and the gap 8px, so their
+ * text starts at 32px. Children are indented 24px and padded 8px, so a child's
+ * icon lands exactly under its parent's text — the tree reads by alignment,
+ * not by rails. Forms repeat the same step one level further in.
  */
 .workspace-sidebar {
   --chrome-text: #12100e;
@@ -378,14 +442,15 @@ button {
   --brand-soft: color-mix(in srgb, var(--brand-tint) 30%, #ffffff);
   --brand-hover: color-mix(in srgb, var(--brand-tint) 10%, #ffffff);
   background: #ffffff;
+  padding: var(--space-lg) var(--space-md) var(--space-md-2);
 }
 
 .sidebar__top {
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 14px 12px 14px 14px;
+  gap: var(--space-sm-2);
+  padding: 0 0 var(--space-md-2) var(--space-xs);
   border-bottom: 1px solid var(--chrome-hairline);
 }
 
@@ -394,48 +459,49 @@ button {
   min-width: 0;
   display: flex;
   align-items: center;
-  gap: 11px;
+  gap: var(--space-sm-2);
 }
 
 .sidebar__badge {
   flex-shrink: 0;
-  width: 42px;
-  height: 42px;
+  width: 32px;
+  height: 32px;
   display: grid;
   place-items: center;
-  border-radius: 11px;
+  border-radius: var(--radius-sm);
   color: #ffffff;
   background: linear-gradient(
     135deg,
     color-mix(in srgb, var(--brand-tint) 70%, var(--brand-accent)),
     var(--brand-accent)
   );
-  box-shadow: 0 4px 10px color-mix(in srgb, var(--brand-accent) 24%, transparent);
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--brand-accent) 22%, transparent);
 }
-.sidebar__badge svg { stroke-width: 2.1; }
+.sidebar__badge svg { stroke-width: 2; }
 
 .sidebar__name {
-  font-size: 16px;
-  font-weight: 700;
+  font-size: var(--text-brand);
+  font-weight: 800;
   line-height: 1.25;
-  letter-spacing: -0.01em;
+  letter-spacing: var(--tracking-brand);
   color: var(--brand-accent);
   text-wrap: balance;
 }
 
 .sidebar__collapse {
-  width: 38px;
-  height: 38px;
+  width: 32px;
+  height: 32px;
   flex-shrink: 0;
   display: grid;
   place-items: center;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   border: 1px solid var(--chrome-hairline);
   background: #ffffff;
   color: var(--brand-accent);
-  box-shadow: 0 1px 2px rgba(18, 16, 14, 0.05);
+  box-shadow: var(--shadow-xs);
   transition: border-color 0.15s ease, background 0.15s ease;
 }
+.sidebar__collapse svg { stroke-width: var(--icon-stroke-control); }
 .sidebar__collapse:hover {
   border-color: var(--brand-accent);
   background: var(--brand-hover);
@@ -448,40 +514,40 @@ button {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 22px;
-  padding: 18px 12px 20px;
+  gap: var(--space-md);
+  padding: var(--space-md-2) 0;
+  scrollbar-width: thin;
 }
 
-.navsection {
+.navsection,
+.navgroup {
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: var(--space-xs);
 }
+.navsection { gap: var(--space-sm); }
+.navsection + .navsection { margin-top: var(--space-xs); }
 
-/* A heading: its own white tile, then the name in bold. */
+/* A parent row: module, or group on a single-module portal. */
 .navhead {
   display: flex;
   align-items: center;
-  gap: 11px;
-  padding: 0 4px 4px;
+  gap: var(--icon-gap);
+  padding: var(--space-xs) var(--space-sm);
 }
 .navhead__tile {
   flex-shrink: 0;
-  width: 34px;
-  height: 34px;
   display: grid;
   place-items: center;
-  border-radius: 10px;
-  border: 1px solid var(--chrome-hairline);
-  background: #ffffff;
+  width: var(--icon);
+  height: var(--icon);
   color: var(--brand-accent);
-  box-shadow: 0 1px 3px rgba(18, 16, 14, 0.06);
 }
 .navhead__title {
-  font-size: 15px;
-  font-weight: 700;
-  line-height: 1.3;
+  font-size: var(--text-nav);
+  font-weight: 600;
+  line-height: 16px;
   color: var(--chrome-text);
   text-wrap: balance;
 }
@@ -490,14 +556,14 @@ button {
 .navsub {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
-  padding: 2px 8px 6px 14px;
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 1.35;
+  gap: var(--icon-gap);
+  padding: var(--space-xs) var(--space-sm) var(--space-xs) calc(var(--space-xl) + var(--space-sm));
+  font-size: var(--text-nav);
+  font-weight: 600;
+  line-height: 16px;
   color: var(--chrome-text-2);
 }
-.navsub svg { flex-shrink: 0; margin-top: 1px; color: var(--brand-accent); }
+.navsub svg { flex-shrink: 0; color: var(--brand-accent); }
 
 .modlist {
   list-style: none;
@@ -505,32 +571,33 @@ button {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: var(--space-2xs);
 }
-.modlist--nested { padding-left: 10px; }
+.modlist--nested { padding-left: var(--space-xl); }
 
-/* Rows wrap rather than truncate: the full application names are long. */
+/* A child row. Rows wrap rather than truncate: the application names are long. */
 .modlist__item {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
-  padding: 9px 12px;
-  border-radius: 12px;
-  font-size: 15px;
-  line-height: 1.35;
+  gap: var(--icon-gap);
+  padding: 7px var(--space-sm);
+  border-radius: var(--radius-md);
+  font-size: var(--text-nav);
+  font-weight: 400;
+  line-height: 16px;
   color: var(--chrome-text-2);
   transition: background 0.15s ease, color 0.15s ease;
 }
 .modlist__item span {
-  text-wrap: balance;
+  text-wrap: pretty;
   overflow-wrap: break-word;
 }
-.modlist__item svg { flex-shrink: 0; margin-top: 1px; color: var(--brand-accent); }
+.modlist__item svg { flex-shrink: 0; color: var(--brand-accent); }
 .modlist__item:hover { background: var(--brand-hover); color: var(--chrome-text); }
 .modlist__item.is-active {
   background: var(--brand-soft);
   color: var(--chrome-text);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 /*
@@ -538,75 +605,39 @@ button {
  * quieter than the dashboard it feeds; it still lights up like any row.
  */
 .modlist--form {
-  padding: 2px 0 0 30px;
-  gap: 0;
+  padding: var(--space-2xs) 0 0 var(--space-xl);
 }
 .modlist__item--form {
-  padding: 6px 10px;
-  font-size: 13px;
   color: var(--chrome-dim);
 }
-.modlist__item--form svg { margin-top: 2px; }
 
-/* ---------- account ---------- */
+/* ---------- logout ---------- */
 
 .sidebar__foot {
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 4px;
-  padding: 12px 12px 14px;
+  gap: var(--space-2xs);
+  padding-top: var(--space-md);
   border-top: 1px solid var(--chrome-hairline);
-}
-
-.account {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  min-width: 0;
-  padding: 4px;
-}
-.account__avatar {
-  flex-shrink: 0;
-  width: 34px;
-  height: 34px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  font-size: 14px;
-  font-weight: 700;
-  color: #ffffff;
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--brand-tint) 70%, var(--brand-accent)),
-    var(--brand-accent)
-  );
-}
-.account__name {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--chrome-text);
 }
 
 .logout {
   display: flex;
   align-items: center;
-  gap: 11px;
-  padding: 8px 6px;
+  gap: var(--icon-gap);
+  padding: 7px var(--space-sm);
   border: 0;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   background: none;
-  font-size: 15px;
+  font-size: var(--text-label);
   font-weight: 600;
+  line-height: 16px;
   color: var(--chrome-text);
   transition: background 0.15s ease, color 0.15s ease;
 }
-.logout svg { flex-shrink: 0; color: var(--chrome-text-2); }
+.logout svg { flex-shrink: 0; color: var(--chrome-text-2); stroke-width: var(--icon-stroke-control); }
 .logout:hover { background: var(--brand-hover); color: var(--brand-accent); }
 .logout:hover svg { color: var(--brand-accent); }
 
@@ -641,15 +672,15 @@ button {
   position: relative;
   z-index: 1;
   max-width: 42rem;
-  padding: 48px 40px;
+  padding: var(--space-2xl-2) var(--space-2xl);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--space-md);
 }
 
 .welcome-copy h1 {
-  font-size: clamp(1.6rem, 3.2vw, 2.4rem);
-  line-height: 1.15;
+  font-size: var(--text-display);
+  line-height: 1.2;
 }
 
 .welcome-tagline {
@@ -715,62 +746,65 @@ button {
 .login-panel {
   display: grid;
   place-items: center;
-  padding: 32px 24px;
+  padding: var(--space-2xl) var(--space-xl);
 }
 
 .login-card {
   width: 100%;
-  max-width: 460px;
+  max-width: 400px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
-  padding: 30px 26px;
-  border-radius: 16px;
+  gap: var(--space-md-2);
+  padding: var(--space-xl-2) var(--space-xl);
+  border-radius: var(--radius-lg);
   border: 1px solid color-mix(in srgb, var(--login-tint) 35%, #ffffff);
   background: #ffffff;
   box-shadow:
     0 1px 2px rgba(18, 16, 14, 0.04),
-    0 18px 40px color-mix(in srgb, var(--login-accent) 16%, transparent);
+    0 10px 28px color-mix(in srgb, var(--login-accent) 12%, transparent);
 }
 
 .login-card__badge {
   display: grid;
   place-items: center;
-  width: 54px;
-  height: 54px;
-  border-radius: 10px;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
   color: #ffffff;
   background: var(--login-accent);
 }
-.login-card__badge svg { stroke-width: 2.2; }
+.login-card__badge svg { stroke-width: 2; }
 
 .login-card__title {
-  margin: 2px 0 6px;
-  font-size: clamp(1.45rem, 2.6vw, 1.95rem);
+  margin: 0 0 var(--space-xs);
+  font-size: var(--text-display);
   font-weight: 700;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
+  line-height: 1.2;
+  letter-spacing: var(--tracking-heading);
   text-align: center;
   text-wrap: balance;
   color: var(--login-accent);
 }
 
-.field { width: 100%; display: flex; flex-direction: column; gap: 6px; }
+.field { width: 100%; display: flex; flex-direction: column; gap: var(--space-xs-2); }
 
 .field label {
-  font-size: 13px;
-  font-weight: 500;
+  font-size: var(--text-label);
+  font-weight: 400;
+  line-height: 1.3;
   color: var(--chrome-text-2);
 }
 
 .field input {
   width: 100%;
   min-height: 48px;
-  padding: 0 14px;
-  border-radius: 8px;
+  padding: var(--space-md) var(--space-md-2);
+  border-radius: var(--radius-md);
   border: 1.5px solid color-mix(in srgb, var(--login-tint) 50%, #ffffff);
   background: color-mix(in srgb, var(--login-tint) 5%, #ffffff);
+  font-size: var(--text-base);
+  line-height: 1.4;
   color: var(--chrome-text);
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
@@ -785,21 +819,20 @@ button {
 .login-card__error {
   width: 100%;
   margin: 0;
-  font-size: 13px;
+  font-size: var(--text-label);
+  line-height: 1.4;
   color: var(--chrome-danger);
 }
 
 .login-card__submit {
   width: 100%;
-  margin-top: 8px;
-  min-height: 44px;
-  border-radius: 8px;
+  margin-top: var(--space-xs);
   background: linear-gradient(
     90deg,
     var(--login-accent),
     color-mix(in srgb, var(--login-accent) 80%, #000000)
   );
-  box-shadow: 0 6px 16px color-mix(in srgb, var(--login-accent) 22%, transparent);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--login-accent) 20%, transparent);
   transition: filter 0.15s ease;
 }
 .login-card__submit:hover:not(:disabled) {
@@ -815,15 +848,16 @@ button {
    Legal
    ========================================================================= */
 .legal {
+  width: 100%;
   max-width: 52rem;
   margin: 0 auto;
-  padding: 40px 24px 64px;
+  padding: var(--space-2xl) var(--space-xl) var(--space-3xl);
 }
 
 .legal-crumbs {
-  font-size: 13px;
+  font-size: var(--text-label);
   color: var(--caption);
-  margin-bottom: 16px;
+  margin-bottom: var(--space-lg);
 }
 
 .legal-crumbs a:hover {
@@ -832,13 +866,13 @@ button {
 
 .legal h1 {
   text-align: left;
-  font-size: clamp(1.6rem, 3vw, 2.2rem);
-  margin-bottom: 16px;
+  font-size: var(--text-display);
+  margin-bottom: var(--space-lg);
 }
 
 .legal p {
   color: var(--text-3);
-  margin: 0 0 14px;
+  margin: 0 0 var(--space-md-2);
 }
 
 /* ============================================================================
@@ -857,18 +891,21 @@ button {
   z-index: 1;
   max-width: 72rem;
   margin: 0 auto;
-  padding: 40px 24px 24px;
+  padding: var(--space-2xl) var(--space-xl) var(--space-xl);
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 32px;
+  gap: var(--space-xl-2);
 }
 
 .footer-col h2 {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  margin-bottom: 12px;
+  gap: var(--icon-gap);
+  font-size: var(--text-caption);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caption);
+  margin-bottom: var(--space-md);
 }
 
 .footer-col h2 svg {
@@ -876,20 +913,21 @@ button {
 }
 
 .footer-brand-name {
-  font-size: 15px;
+  font-size: var(--text-button);
+  letter-spacing: var(--tracking-brand);
   font-weight: 700;
   color: var(--text);
 }
 
 .footer-brand-sub {
-  font-size: 12px;
+  font-size: var(--text-nav);
   color: var(--leaf-400);
-  margin-bottom: 8px;
+  margin-bottom: var(--space-sm);
 }
 
 .footer-col p,
 .footer-col li {
-  font-size: 13px;
+  font-size: var(--text-label);
   color: var(--caption);
 }
 
@@ -899,7 +937,7 @@ button {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-sm);
 }
 
 .footer-col a:hover {
@@ -911,19 +949,19 @@ button {
   z-index: 1;
   max-width: 72rem;
   margin: 0 auto;
-  padding: 16px 24px 32px;
+  padding: var(--space-lg) var(--space-xl) var(--space-xl-2);
   border-top: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  font-size: 12px;
+  gap: var(--space-sm);
+  font-size: var(--text-caption);
   color: var(--dim);
 }
 
 .footer-legal-links {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: var(--space-sm) var(--space-lg-2);
 }
 
 .footer-legal-links a:hover {
@@ -933,6 +971,17 @@ button {
 /* ============================================================================
    Responsive
    ========================================================================= */
+/* Multi-column content stacks and page padding tightens. */
+@media (max-width: 900px) {
+  .footer-inner {
+    grid-template-columns: 1fr;
+    gap: var(--space-xl);
+    padding: var(--space-xl-2) var(--space-lg) var(--space-lg-2);
+  }
+  .footer-bottom { padding: var(--space-lg) var(--space-lg) var(--space-xl); }
+  .legal { padding: var(--space-xl-2) var(--space-lg) var(--space-2xl); }
+}
+
 @media (max-width: 960px) {
   /* The sidebar becomes an overlay drawer. Width-0 is deliberately NOT used
      here: a drawer must keep its width so it can slide out of the viewport. */
@@ -942,7 +991,8 @@ button {
     top: 0;
     bottom: 0;
     left: 0;
-    width: 300px;
+    width: var(--sidebar-w);
+    max-width: calc(100vw - var(--space-2xl-2));
     height: auto;
     transform: none;
     box-shadow: 12px 0 32px rgba(10, 20, 16, 0.25);
@@ -950,7 +1000,8 @@ button {
   }
 
   .workspace.is-nav-closed .workspace-sidebar {
-    width: 300px;
+    width: var(--sidebar-w);
+    padding: var(--space-lg) var(--space-md) var(--space-md-2);
     border-right-width: 1px;
     opacity: 1;
     transform: translateX(-105%);
@@ -969,7 +1020,7 @@ button {
   }
 
   .welcome-copy {
-    padding: 32px 24px;
+    padding: var(--space-xl-2) var(--space-lg);
   }
 }
 
@@ -980,5 +1031,9 @@ button {
 
   .login-visual {
     min-height: 180px;
+  }
+
+  .login-panel {
+    padding: var(--space-xl) var(--space-lg) var(--space-2xl);
   }
 }
